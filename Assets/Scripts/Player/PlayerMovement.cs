@@ -10,7 +10,12 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce = 12f;
 
     [Header("Gravity Settings")]
-    public float fallMultiplier = 2.5f;  // Gravity scale multiplier when falling
+    public float fallMultiplier = 2.5f;
+
+    [Header("Ground Check Settings")]
+    public Transform groundCheck;
+    public float groundCheckRadius = 0.1f;
+    public LayerMask groundLayer;
 
     private float initialMoveSpeed;
     private Rigidbody2D rb;
@@ -29,22 +34,21 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Gradually increase speed over time
+        // Ground Check
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+
+        // Gradually increase speed
         if (moveSpeed < maxSpeed)
-        {
             moveSpeed += speedIncreaseRate * Time.deltaTime;
-        }
 
         // Apply horizontal movement
         rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
 
-        // Apply stronger gravity when falling
+        // Stronger gravity while falling
         if (rb.velocity.y < 0)
         {
             rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
         }
-
-
 
         // Handle animations
         if (isGrounded)
@@ -61,37 +65,22 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        // Handle jumping
+        // Jumping
         if (isGrounded && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)))
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
-        // Handle quick fall / drop input
+
+        // Quick fall
         if (!isGrounded && (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)))
         {
-            rb.velocity += Vector2.down * jumpForce * 0.5f * Time.deltaTime; // Tweak 0.5f multiplier as needed
+            rb.velocity += Vector2.down * jumpForce * 0.5f * Time.deltaTime;
         }
 
-
-    }
-
-    void OnCollisionStay2D(Collision2D collision)
-    {
-        if (collision.collider.CompareTag("Floor"))
+        // Reset jump when grounded
+        if (isGrounded)
         {
-            if (!isGrounded)
-            {
-                isGrounded = true;
-                isJumping = false;
-            }
-        }
-    }
-
-    void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.collider.CompareTag("Floor"))
-        {
-            isGrounded = false;
+            isJumping = false;
         }
     }
 
@@ -103,5 +92,14 @@ public class PlayerMovement : MonoBehaviour
     public void ResetSpeed()
     {
         moveSpeed = initialMoveSpeed;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        }
     }
 }

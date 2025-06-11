@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 
 [RequireComponent(typeof(PlayerMovement))]
@@ -14,18 +15,20 @@ public class PlayerPowerState : MonoBehaviour
     public float explosionRadius = 5f;
 
     [Header("Destruction Effects")]
-    public float delayBeforeBlink = 0.4f;   // Delay after push before blinking starts
-    public float destroyDelay = 0.6f;       // Duration of blinking before destruction
-    public float blinkInterval = 0.1f;      // Frequency of blink on/off
+    public float delayBeforeBlink = 0.4f;
+    public float destroyDelay = 0.6f;
+    public float blinkInterval = 0.1f;
 
     private Vector3 originalScale;
     private Coroutine resetCoroutine;
     private PlayerMovement movement;
+    private Collider2D playerCollider;
 
     void Start()
     {
         originalScale = transform.localScale;
         movement = GetComponent<PlayerMovement>();
+        playerCollider = GetComponent<Collider2D>();
     }
 
     public void ActivateGiantMode(float duration)
@@ -35,7 +38,6 @@ public class PlayerPowerState : MonoBehaviour
 
         if (isGiant)
         {
-            // Just reset the duration if already giant
             resetCoroutine = StartCoroutine(ResetAfterTime(duration));
             return;
         }
@@ -65,11 +67,9 @@ public class PlayerPowerState : MonoBehaviour
         });
     }
 
-
     private IEnumerator ResetAfterTime(float seconds)
     {
         yield return new WaitForSeconds(seconds);
-
         yield return PauseGameTemporarily(0.3f);
         if (movement != null) movement.enabled = false;
 
@@ -93,37 +93,42 @@ public class PlayerPowerState : MonoBehaviour
     {
         Time.timeScale = 0f;
         float timer = 0f;
-
         while (timer < realSeconds)
         {
             timer += Time.unscaledDeltaTime;
             yield return null;
         }
-
         Time.timeScale = 1f;
     }
 
     public void HandleObstacleCollision(GameObject hitObstacle)
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
+        if (!hitObstacle.CompareTag("Obstacles")) return;
 
-        foreach (Collider2D col in hits)
+        // Disable parent collider so it doesn't block the player
+        Collider2D parentCollider = hitObstacle.GetComponent<Collider2D>();
+        if (parentCollider != null)
         {
-            if (col.CompareTag("Obstacles"))
+            parentCollider.enabled = false;
+        }
+
+        Transform parent = hitObstacle.transform.parent;
+        if (parent == null) return;
+
+        Rigidbody2D[] boxesToPush = parent.GetComponentsInChildren<Rigidbody2D>();
+
+        foreach (Rigidbody2D rb in boxesToPush)
+        {
+            if (rb != null)
             {
-                Rigidbody2D rb = col.attachedRigidbody ?? col.GetComponent<Rigidbody2D>();
+                rb.bodyType = RigidbodyType2D.Dynamic;
+                rb.gravityScale = 1f;
+                rb.constraints = RigidbodyConstraints2D.None;
 
-                if (rb != null)
-                {
-                    rb.bodyType = RigidbodyType2D.Dynamic;
-                    rb.gravityScale = 1f;
-                    rb.constraints = RigidbodyConstraints2D.None;
+                Vector2 dir = (rb.transform.position - transform.position).normalized;
+                rb.AddForce(dir * pushForce, ForceMode2D.Impulse);
 
-                    Vector2 dir = (col.transform.position - transform.position).normalized;
-                    rb.AddForce(dir * pushForce, ForceMode2D.Impulse);
-                }
-
-                StartCoroutine(DelayedBlinkAndDestroy(col.gameObject, delayBeforeBlink, destroyDelay));
+                StartCoroutine(DelayedBlinkAndDestroy(rb.gameObject, delayBeforeBlink, destroyDelay));
             }
         }
     }
@@ -139,12 +144,11 @@ public class PlayerPowerState : MonoBehaviour
             col.enabled = false;
         }
 
-        // Blink before destruction
+        // Blink effect
         SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
         if (sr != null)
         {
             float timer = 0f;
-
             while (timer < blinkDuration)
             {
                 sr.enabled = false;
@@ -156,14 +160,5 @@ public class PlayerPowerState : MonoBehaviour
         }
 
         Destroy(obj);
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        if (isGiant)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, explosionRadius);
-        }
     }
 }
