@@ -1,17 +1,13 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour
 {
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI highScoreText;
 
-    public PlayerMovement player;
-
-    private float currentScore = 0f;
+    private int currentScore = 0;
     private int highScore = 0;
-    private bool isRunning = true;
 
     void Start()
     {
@@ -19,18 +15,15 @@ public class ScoreManager : MonoBehaviour
         UpdateUI();
     }
 
-    void Update()
+    public void AddScore(int amount)
     {
-        if (!isRunning || player == null) return;
-
-        currentScore += player.GetMoveSpeed() * Time.deltaTime;
+        currentScore += amount;
         UpdateUI();
     }
 
     public void StopScore()
     {
-        isRunning = false;
-        int finalScore = Mathf.FloorToInt(currentScore);
+        int finalScore = currentScore;
 
         if (finalScore > highScore)
         {
@@ -43,14 +36,14 @@ public class ScoreManager : MonoBehaviour
     void UpdateUI()
     {
         if (scoreText != null)
-            scoreText.text = "" + Mathf.FloorToInt(currentScore);
+            scoreText.text = currentScore.ToString();
 
         if (highScoreText != null)
-            highScoreText.text = "Best: " + highScore;
+            highScoreText.text = "" + highScore;
     }
 
     public int GetFinalScore()
     {
-        return Mathf.FloorToInt(currentScore);
+        return currentScore;
     }
 }

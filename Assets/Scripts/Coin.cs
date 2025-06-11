@@ -14,6 +14,12 @@ public class Coin : MonoBehaviour
                 playerCoins.AddCoins(value);
             }
 
+            ScoreManager scoreManager = FindObjectOfType<ScoreManager>();
+            if (scoreManager != null)
+            {
+                scoreManager.AddScore(value); // Add to score when collecting coin
+            }
+
             Destroy(gameObject);
         }
     }

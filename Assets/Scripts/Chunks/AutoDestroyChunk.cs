@@ -16,7 +16,7 @@ public class AutoDestroyChunk : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[AutoDestroyChunk] Player not found — make sure it has tag 'Player'");
+            //Debug.LogWarning("[AutoDestroyChunk] Player not found — make sure it has tag 'Player'");
         }
     }
 
@@ -27,7 +27,7 @@ public class AutoDestroyChunk : MonoBehaviour
         // If this chunk's rightmost edge is far behind the player, destroy it
         if (transform.position.x < player.position.x - destroyDistance)
         {
-            Debug.Log($"[AutoDestroyChunk] Destroying chunk {gameObject.name} at X={transform.position.x}");
+            //Debug.Log($"[AutoDestroyChunk] Destroying chunk {gameObject.name} at X={transform.position.x}");
             Destroy(gameObject);
         }
     }

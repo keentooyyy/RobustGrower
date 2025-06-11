@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SawBlade
+  m_Name: Idle
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -22,18 +22,18 @@ AnimationClip:
     curve:
     - time: 0
       value: {fileID: -7863870526055978212, guid: d27439d30c2671947aba3fef138b46a2, type: 3}
-    - time: 0.016666668
+    - time: 0.01
       value: {fileID: -7983349461781657208, guid: d27439d30c2671947aba3fef138b46a2, type: 3}
-    - time: 0.033333335
+    - time: 0.02
       value: {fileID: 5307359775540273274, guid: d27439d30c2671947aba3fef138b46a2, type: 3}
-    - time: 0.05
+    - time: 0.03
       value: {fileID: 540031860937134154, guid: d27439d30c2671947aba3fef138b46a2, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
     script: {fileID: 0}
     flags: 2
-  m_SampleRate: 60
+  m_SampleRate: 100
   m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
@@ -59,7 +59,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.06666667
+    m_StopTime: 0.04
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0

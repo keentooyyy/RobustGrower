@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 6088936831028545377}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.74, y: -3.11, z: 0}
+  m_LocalPosition: {x: 10.81, y: -3.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -119,7 +119,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3277873201956378939, guid: 0edc1f5d8902e444880752d23d34a154, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -1.49
+      value: 1.3
       objectReference: {fileID: 0}
     - target: {fileID: 3277873201956378939, guid: 0edc1f5d8902e444880752d23d34a154, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -374,10 +374,6 @@ PrefabInstance:
     - target: {fileID: 647024864086894568, guid: 94047e27736277e4092c150604ffcc05, type: 3}
       propertyPath: m_Name
       value: Floor
-      objectReference: {fileID: 0}
-    - target: {fileID: 3796227550411270202, guid: 94047e27736277e4092c150604ffcc05, type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6270864459632419763, guid: 94047e27736277e4092c150604ffcc05, type: 3}
       propertyPath: m_LocalPosition.x

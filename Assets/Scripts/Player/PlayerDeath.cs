@@ -33,7 +33,7 @@ public class PlayerDeath : MonoBehaviour
     void Die()
     {
         isDead = true;
-        Debug.Log("Dead.");
+        //Debug.Log("Dead.");
 
         if (movement != null)
             movement.enabled = false;
