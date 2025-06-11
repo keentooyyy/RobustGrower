@@ -1,61 +1,118 @@
 using UnityEngine;
 using System.Collections;
+using DG.Tweening;
 
+[RequireComponent(typeof(PlayerMovement))]
 public class PlayerPowerState : MonoBehaviour
 {
+    [Header("Giant Settings")]
     public bool isGiant = false;
     public Vector3 giantScale = new Vector3(3f, 3f, 3f);
     public float pushForce = 20f;
-    public float destroyDelay = 0.2f;
+
+    [Header("Explosion")]
+    public float explosionRadius = 5f;
+
+    [Header("Destruction Effects")]
+    public float delayBeforeBlink = 0.4f;   // Delay after push before blinking starts
+    public float destroyDelay = 0.6f;       // Duration of blinking before destruction
+    public float blinkInterval = 0.1f;      // Frequency of blink on/off
 
     private Vector3 originalScale;
     private Coroutine resetCoroutine;
+    private PlayerMovement movement;
 
     void Start()
     {
         originalScale = transform.localScale;
+        movement = GetComponent<PlayerMovement>();
     }
 
     public void ActivateGiantMode(float duration)
     {
-        // Apply giant mode scale and state
-        if (!isGiant)
-        {
-            isGiant = true;
-            transform.localScale = giantScale;
-        }
-
-        // Reset the timer if already active
         if (resetCoroutine != null)
-        {
             StopCoroutine(resetCoroutine);
+
+        if (isGiant)
+        {
+            // Just reset the duration if already giant
+            resetCoroutine = StartCoroutine(ResetAfterTime(duration));
+            return;
         }
 
-        resetCoroutine = StartCoroutine(ResetAfterTime(duration));
+        transform.localScale = originalScale;
+
+        StartCoroutine(PauseGameTemporarily(0.3f));
+        if (movement != null) movement.enabled = false;
+
+        Sequence growSeq = DOTween.Sequence().SetUpdate(true);
+        float bounceTime = 0.1f;
+
+        for (int i = 0; i < 3; i++)
+        {
+            growSeq.Append(transform.DOScale(giantScale * 0.6f, bounceTime).SetUpdate(true));
+            growSeq.Append(transform.DOScale(giantScale * 1.1f, bounceTime).SetUpdate(true));
+        }
+
+        growSeq.Append(transform.DOScale(giantScale, 0.15f).SetUpdate(true));
+
+        isGiant = true;
+
+        growSeq.OnComplete(() =>
+        {
+            if (movement != null) movement.enabled = true;
+            resetCoroutine = StartCoroutine(ResetAfterTime(duration));
+        });
     }
+
 
     private IEnumerator ResetAfterTime(float seconds)
     {
         yield return new WaitForSeconds(seconds);
 
-        transform.localScale = originalScale;
-        isGiant = false;
-        resetCoroutine = null;
+        yield return PauseGameTemporarily(0.3f);
+        if (movement != null) movement.enabled = false;
+
+        Sequence shrinkSeq = DOTween.Sequence().SetUpdate(true);
+        float bounceTime = 0.1f;
+
+        shrinkSeq.Append(transform.DOScale(giantScale * 0.6f, bounceTime).SetUpdate(true));
+        shrinkSeq.Append(transform.DOScale(giantScale * 1.1f, bounceTime).SetUpdate(true));
+        shrinkSeq.Append(transform.DOScale(originalScale * 1.2f, bounceTime).SetUpdate(true));
+        shrinkSeq.Append(transform.DOScale(originalScale, 0.15f).SetUpdate(true));
+
+        shrinkSeq.OnComplete(() =>
+        {
+            isGiant = false;
+            resetCoroutine = null;
+            if (movement != null) movement.enabled = true;
+        });
+    }
+
+    private IEnumerator PauseGameTemporarily(float realSeconds)
+    {
+        Time.timeScale = 0f;
+        float timer = 0f;
+
+        while (timer < realSeconds)
+        {
+            timer += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        Time.timeScale = 1f;
     }
 
     public void HandleObstacleCollision(GameObject hitObstacle)
     {
-        float explosionRadius = 5f;
-        float explosionForce = pushForce;
-
-        // Push all nearby obstacles
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
 
         foreach (Collider2D col in hits)
         {
             if (col.CompareTag("Obstacles"))
             {
-                Rigidbody2D rb = col.attachedRigidbody;
+                Rigidbody2D rb = col.attachedRigidbody ?? col.GetComponent<Rigidbody2D>();
+
                 if (rb != null)
                 {
                     rb.bodyType = RigidbodyType2D.Dynamic;
@@ -63,28 +120,50 @@ public class PlayerPowerState : MonoBehaviour
                     rb.constraints = RigidbodyConstraints2D.None;
 
                     Vector2 dir = (col.transform.position - transform.position).normalized;
-                    rb.AddForce(dir * explosionForce, ForceMode2D.Impulse);
+                    rb.AddForce(dir * pushForce, ForceMode2D.Impulse);
                 }
+
+                StartCoroutine(DelayedBlinkAndDestroy(col.gameObject, delayBeforeBlink, destroyDelay));
             }
         }
     }
 
-    private IEnumerator DestroyAfterDelay(GameObject obj, float delay)
+    private IEnumerator DelayedBlinkAndDestroy(GameObject obj, float delayBeforeBlink, float blinkDuration)
     {
-        yield return new WaitForSeconds(delay);
-        if (obj != null)
+        yield return new WaitForSeconds(delayBeforeBlink);
+
+        // Disable colliders to prevent re-collision
+        Collider2D[] colliders = obj.GetComponents<Collider2D>();
+        foreach (var col in colliders)
         {
-            Destroy(obj);
+            col.enabled = false;
         }
+
+        // Blink before destruction
+        SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            float timer = 0f;
+
+            while (timer < blinkDuration)
+            {
+                sr.enabled = false;
+                yield return new WaitForSeconds(blinkInterval);
+                sr.enabled = true;
+                yield return new WaitForSeconds(blinkInterval);
+                timer += blinkInterval * 2;
+            }
+        }
+
+        Destroy(obj);
     }
 
-    // Optional: Draw explosion radius in Scene view
     void OnDrawGizmosSelected()
     {
         if (isGiant)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, 5f);
+            Gizmos.DrawWireSphere(transform.position, explosionRadius);
         }
     }
 }
