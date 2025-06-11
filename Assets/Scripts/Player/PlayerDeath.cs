@@ -21,7 +21,16 @@ public class PlayerDeath : MonoBehaviour
             PlayerPowerState powerState = GetComponent<PlayerPowerState>();
             if (powerState != null && powerState.isGiant)
             {
-                powerState.HandleObstacleCollision(collision.collider.gameObject);
+                Transform t = collision.collider.transform;
+                while (t != null && t.name != "Box Vertical")
+                {
+                    t = t.parent;
+                }
+
+                if (t != null && t.CompareTag("Obstacles"))
+                {
+                    powerState.HandleObstacleCollision(t.gameObject);
+                }
             }
             else if (!isDead)
             {
@@ -29,6 +38,7 @@ public class PlayerDeath : MonoBehaviour
             }
         }
     }
+
 
     void Die()
     {

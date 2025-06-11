@@ -578,6 +578,7 @@ GameObject:
   - component: {fileID: 7474978492288190771}
   - component: {fileID: 7017759487719446642}
   - component: {fileID: 8162382837607980960}
+  - component: {fileID: 3905918822258272749}
   m_Layer: 0
   m_Name: Box Vertical
   m_TagString: Obstacles
@@ -679,3 +680,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 2.5}
   m_EdgeRadius: 0
+--- !u!114 &3905918822258272749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7264157014842811532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65b4007a978203d46b068643295d5cc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pushForce: 20
+  delayBeforeBlink: 0.4
+  destroyDelay: 0.6
+  blinkInterval: 0.1

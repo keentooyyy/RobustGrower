@@ -14,6 +14,6 @@ public class PlayerCoins : MonoBehaviour
         coinCount += amount;
         PlayerPrefs.SetInt("Coins", coinCount);
         PlayerPrefs.Save();
-        Debug.Log("Coins: " + coinCount);
+        //Debug.Log("Coins: " + coinCount);
     }
 }
