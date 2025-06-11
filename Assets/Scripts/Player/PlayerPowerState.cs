@@ -2,20 +2,28 @@
 using DG.Tweening;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class PlayerPowerState : MonoBehaviour
 {
+    [Header("Giant Mode Settings")]
     public bool isGiant = false;
     public Vector3 giantScale = new Vector3(3f, 3f, 3f);
     public float giantDuration = 5f;
 
+    [Header("Audio")]
+    public AudioClip powerUpSound;
+    public AudioClip powerDownSound;
+
     private Vector3 originalScale;
     private Coroutine resetCoroutine;
     private PlayerMovement movement;
+    private AudioSource audioSource;
 
     void Start()
     {
         originalScale = transform.localScale;
         movement = GetComponent<PlayerMovement>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void ActivateGiantMode(float duration)
@@ -32,7 +40,12 @@ public class PlayerPowerState : MonoBehaviour
         StartCoroutine(PauseGameTemporarily(0.3f));
         if (movement != null) movement.isControlPaused = true;
 
+        // 🔊 Play power-up sound
+        if (powerUpSound != null && audioSource != null)
+            audioSource.PlayOneShot(powerUpSound);
+
         transform.localScale = originalScale;
+
         Sequence growSeq = DOTween.Sequence().SetUpdate(true);
         float bounce = 0.1f;
         for (int i = 0; i < 3; i++)
@@ -55,6 +68,10 @@ public class PlayerPowerState : MonoBehaviour
         yield return new WaitForSeconds(seconds);
         yield return PauseGameTemporarily(0.3f);
         if (movement != null) movement.isControlPaused = true;
+
+        // 🔊 Play power-down sound
+        if (powerDownSound != null && audioSource != null)
+            audioSource.PlayOneShot(powerDownSound);
 
         Sequence shrinkSeq = DOTween.Sequence().SetUpdate(true);
         float bounce = 0.1f;
@@ -91,5 +108,4 @@ public class PlayerPowerState : MonoBehaviour
             destroyer.TriggerDestruction(transform.position);
         }
     }
-
 }

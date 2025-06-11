@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,11 +8,15 @@ public class PlayerDeath : MonoBehaviour
     private Rigidbody2D rb;
     private PlayerMovement movement;
     public ScoreManager scoreManager;
+    public GameOverManager gameOverManager;
+
+    private AnimatorControllerHelper animator;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         movement = GetComponent<PlayerMovement>();
+        animator = GetComponent<AnimatorControllerHelper>();
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -39,11 +44,9 @@ public class PlayerDeath : MonoBehaviour
         }
     }
 
-
     void Die()
     {
         isDead = true;
-        //Debug.Log("Dead.");
 
         if (movement != null)
             movement.enabled = false;
@@ -54,9 +57,25 @@ public class PlayerDeath : MonoBehaviour
             rb.gravityScale = 2f;
         }
 
-        GetComponent<AnimatorControllerHelper>()?.PlayAnimation("Death");
+        if (animator != null)
+        {
+            animator.PlayAnimation("Death");
+            StartCoroutine(WaitThenTriggerGameOver());
+        }
+        else
+        {
+            gameOverManager.TriggerGameOver();
+        }
 
         if (scoreManager != null)
             scoreManager.StopScore();
+    }
+
+    private IEnumerator WaitThenTriggerGameOver()
+    {
+        // Estimate duration of "Death" animation
+        yield return new WaitForSecondsRealtime(.5f); // adjust based on your actual animation
+
+        gameOverManager.TriggerGameOver();
     }
 }

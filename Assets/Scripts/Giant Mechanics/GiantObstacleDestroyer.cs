@@ -1,6 +1,7 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(AudioSource))]
 public class GiantObstacleDestroyer : MonoBehaviour
 {
     [Header("Giant Interaction")]
@@ -11,14 +12,30 @@ public class GiantObstacleDestroyer : MonoBehaviour
     public float destroyDelay = 0.6f;
     public float blinkInterval = 0.1f;
 
+    [Header("Audio")]
+    public AudioClip destructionSound;
+
     private bool isDestroyed = false;
+    public AudioSource audioSource;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+    }
 
     public void TriggerDestruction(Vector3 playerPosition)
     {
         if (isDestroyed) return;
         isDestroyed = true;
 
-        // Push rigidbodies first
+        // 🔊 Play sound first, then push immediately
+        if (destructionSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(destructionSound);
+        }
+
+        // 💥 Push rigidbodies
         Rigidbody2D[] rbs = GetComponentsInChildren<Rigidbody2D>();
         foreach (var rb in rbs)
         {
@@ -34,14 +51,13 @@ public class GiantObstacleDestroyer : MonoBehaviour
             }
         }
 
-        // Disable all colliders immediately to prevent blocking
+        // 🚫 Disable all colliders immediately
         Collider2D[] cols = GetComponentsInChildren<Collider2D>();
         foreach (var col in cols)
             col.enabled = false;
 
         StartCoroutine(BlinkAndDestroy());
     }
-
 
     private IEnumerator BlinkAndDestroy()
     {
