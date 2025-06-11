@@ -6,6 +6,7 @@
 *.user
 *.suo
 *.tmp
+.idea/
 
 # ===== Unity Generated Folders =====
 [Ll]ibrary/
