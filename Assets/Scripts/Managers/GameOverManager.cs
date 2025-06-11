@@ -47,6 +47,7 @@ public class GameOverManager : MonoBehaviour
     public void QuitGame()
     {
         Debug.Log("Quit game pressed.");
+        Time.timeScale = 1f; // ✅ Reset before quitting
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

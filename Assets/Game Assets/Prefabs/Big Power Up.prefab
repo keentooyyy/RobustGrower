@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8844263514504003789}
   - component: {fileID: 6417654925462464809}
   - component: {fileID: 6783750445885618404}
+  - component: {fileID: 1171124425096889893}
   m_Layer: 0
   m_Name: Big Power Up
   m_TagString: Untagged
@@ -144,3 +145,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1171124425096889893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5371396019579172322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 742e2c612f67d2748bd4eb4ae26fabd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pulseScale: 1.2
+  pulseDuration: 0.6
+  pulseEase: 4
+  playOnAwake: 1

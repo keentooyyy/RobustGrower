@@ -9,6 +9,7 @@ public class MainMenuManager : MonoBehaviour
     public void PlayGame()
     {
         Debug.Log("Loading game scene: " + gameSceneName);
+        Time.timeScale = 1f; // ✅ Ensure normal time before loading
         SceneManager.LoadScene(gameSceneName);
     }
 

@@ -45,6 +45,7 @@ public class PauseManager : MonoBehaviour
 
     public void QuitGame()
     {
+        Time.timeScale = 1f; // ✅ Reset before quitting
         Debug.Log("Quitting game...");
 
 #if UNITY_EDITOR
