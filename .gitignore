@@ -1,0 +1,39 @@
+# ===== IDE & Editor Files =====
+.vs/
+.vsconfig
+*.csproj
+*.sln
+*.user
+*.suo
+*.tmp
+
+# ===== Unity Generated Folders =====
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+MemoryCaptures/
+UserSettings/
+.cache/
+sysinfo.txt
+
+# ===== OS Files =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Unity Asset Store Tools =====
+Assets/AssetStoreTools*
+
+# ===== Optional Binary Artifacts =====
+*.apk
+*.aab
+*.ipa
+*.unitypackage
+
+# ===== ES3 Save Files (if used) =====
+*.es3
+*.es3data
+*.es3bak
